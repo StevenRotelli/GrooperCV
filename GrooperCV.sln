@@ -1,0 +1,26 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+# Visual Studio 12 Update 5
+MinimumVisualStudioVersion = 11.0.61219.00
+# Project Type guid (C#)
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrooperCV", "GrooperCV.csproj", "{216f3731-97a0-43bf-b2a9-e9b91f397e2a}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{216f3731-97a0-43bf-b2a9-e9b91f397e2a}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{216f3731-97a0-43bf-b2a9-e9b91f397e2a}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{216f3731-97a0-43bf-b2a9-e9b91f397e2a}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{216f3731-97a0-43bf-b2a9-e9b91f397e2a}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62af9856-1e21-4c95-a91d-d9ba7e9bb70c}
+	EndGlobalSection
+EndGlobal

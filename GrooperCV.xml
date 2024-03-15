@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GrooperCV</name>
+    </assembly>
+    <members>
+        <member name="T:GrooperCV.GrooperImageExtensions">
+            <summary>
+            Extension Classes fro Grooper Types
+            </summary>
+        </member>
+        <member name="M:GrooperCV.GrooperImageExtensions.ToMat(Grooper.GrooperImage)">
+            <summary>
+            Returns a Mat from a GrooperImage
+            </summary>
+            <param name="image"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GrooperCV.GrooperImageExtensions.ToGrooperImage(Emgu.CV.Mat)">
+            <summary>
+            Returns a GrooperImage from a Emgu.CV.Mat
+            </summary>
+            <param name="image"></param>
+            <returns></returns>
+        </member>
+        <member name="P:GrooperCV.IpCommands.AutoWarp.Quality">
+            <summary> The image quality to be used for the image processing and detection alogrithms. This does not affect the image quality of the final output </summary>
+            <remarks>Images captured from mobile devices often poses high resolution causing slowness. </remarks>
+        </member>
+        <member name="T:GrooperCV.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:GrooperCV.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:GrooperCV.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:GrooperCV.Properties.Resources.AutoWarp">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="T:GrooperCV.ScriptingSession">
+            <summary>Grooper SciptingSession object. 2023 by BIS (http://www.grooper.com).</summary>
+            <remarks>
+            Welcome to Grooper Scripting!  Here is some quick information for beginners:
+            
+            1) Member variables of this class will stay intact between Initialize() and Uninitialize().
+            2) Please note that compiling this script from Visual Studio will not add/update the ObjectLibrary DLL in Grooper.  To add/update 
+               this DLL in Grooper and make the functionality in this project visible to Grooper, the Compile button must be 
+               used from the Script tab of the Grooper node in the Grooper Web Client.
+            3) Object Library scripts can be used to customize the way that Grooper works.  This can be done by extending a 
+               Grooper class through inheritance or by creating methods that can be called from within Grooper.
+            4) Data Model and Batch Process Scripts operate primarily by responding to events on the object to which they are
+               attached.  Viewing a list of events your script can handle in Visual Studio: select ObjectLibrary from the objects dropdown 
+               above, and then view the right-most dropdown for a list of events.
+            5) You can debug with the GrooperSDK.  Find the GrooperSDK in Visual Studio by going to Extensions..Manage Extensions..Online and searching for 'Grooper'.  
+               In addition to debugging, the GrooperSDK exposes commands such as Save, Save and Compile, and Get Latest.
+            6) More information can be found using Grooper Help (open Grooper and click F1) or the Grooper Wiki: https://wiki.grooper.com/.
+            </remarks>
+        </member>
+    </members>
+</doc>
