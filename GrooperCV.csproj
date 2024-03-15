@@ -34,6 +34,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <GrooperPath Condition="'$(OS)' == 'Windows_NT'">C:\Program Files\BIS\Grooper\</GrooperPath>
+    <GrooperPath Condition="'$(OS)' != 'Windows_NT'">/Users/stevenrotelli/Grooper/</GrooperPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.Bitmap, Version=4.4.0.4099, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>packages\Emgu.CV.Bitmap.4.4.0.4099\lib\netstandard2.0\Emgu.CV.Bitmap.dll</HintPath>
@@ -44,22 +48,22 @@
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
     </Reference>
     <Reference Include="Grooper">
-      <HintPath>C:\Program Files\BIS\Grooper\Grooper.dll</HintPath>
+      <HintPath>$(GrooperPath)Grooper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grooper.Activities">
-      <HintPath>C:\Program Files\BIS\Grooper\Grooper.Activities.dll</HintPath>
+      <HintPath>$(GrooperPath)Grooper.Activities.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grooper.Core">
-      <HintPath>C:\Program Files\BIS\Grooper\Grooper.Core.dll</HintPath>
+      <HintPath>$(GrooperPath)Grooper.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grooper.IP">
-      <HintPath>C:\Program Files\BIS\Grooper\Grooper.IP.dll</HintPath>
+      <HintPath>$(GrooperPath)Grooper.IP.dll</HintPath>
     </Reference>
     <Reference Include="Grooper.Services">
-      <HintPath>C:\Program Files\BIS\Grooper\Grooper.Services.dll</HintPath>
+      <HintPath>$(GrooperPath)Grooper.Services.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
