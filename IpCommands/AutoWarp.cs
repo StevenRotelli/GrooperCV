@@ -13,17 +13,21 @@ using Grooper.IP;
 
 namespace GrooperCV.IpCommands
 {
+  /// <summary>Finds the page within captured image by automatically locating the rectangular shape</summary>
   [DataContract, IconResource("AutoWarp"), Category("OpenCV")]
-  class AutoWarp : IpCommand
+  public class AutoWarp : IpCommand
   {
     #region initialization & properties
+    /// <inheritdoc/>
     public AutoWarp() { }
+    ///<inheritdoc/>
     public AutoWarp(ConnectedObject owner) : base(owner) { }
     /// <summary> The image quality to be used for the image processing and detection alogrithms. This does not affect the image quality of the final output </summary>
     /// <remarks>Images captured from mobile devices often poses high resolution causing slowness. </remarks>
     [DataMember, Viewable, DisplayName("Image Quality"), DV(20), ValueRange(LowValue: 20, HighValue: 100)]
     public int Quality { get; set; }
     #endregion
+    /// <inheritdoc/>
     protected override IpCommandResult ApplyCommand(GrooperImage image)
     {
       IpCommandResult result = new IpCommandResult(this, image);
@@ -42,6 +46,7 @@ namespace GrooperCV.IpCommands
       return result;
     }
 
+    /// <inheritdoc/>
     public Mat DownscaleImage(GrooperImage image, IpCommandResult result)
     {
       Mat inputImage = image.ToMat();
@@ -54,6 +59,7 @@ namespace GrooperCV.IpCommands
       return downscaledImage;
     }
 
+    /// <inheritdoc/>
     public Mat ApplyMorphologicalClose(Mat inputImage, IpCommandResult result)
     {
       Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(5, 5), new Point(-1, -1));
@@ -63,6 +69,7 @@ namespace GrooperCV.IpCommands
       return morphedImage;
     }
 
+    /// <inheritdoc/>
     public Mat ApplyGrabCut(Mat img, IpCommandResult result)
     {
       // Initialize the mask to probable background
@@ -86,6 +93,7 @@ namespace GrooperCV.IpCommands
       return resultImage;
     }
 
+    /// <inheritdoc/>
     public Mat CountourDetection(Mat inputImage, IpCommandResult result)
     {
       // Edge Detection
@@ -130,6 +138,7 @@ namespace GrooperCV.IpCommands
       return contourImage;
     }
 
+    /// <inheritdoc/>
     public Mat ApplyPerspectiveTransform(Mat image, PointF[] srcCorners)
     {
       AdjustPoints(srcCorners, Quality);
@@ -142,6 +151,7 @@ namespace GrooperCV.IpCommands
       return warpedImage;
     }
 
+    /// <inheritdoc/>
     public static PointF[] FindDestinationCoordinates(PointF[] pts)
     {
       // Unpack the points
@@ -180,6 +190,7 @@ namespace GrooperCV.IpCommands
       }
     }
 
+    /// <inheritdoc/>
     public VectorOfPoint AproximateContours(Mat inputImage)
     {
       Mat gray = inputImage;
@@ -209,6 +220,7 @@ namespace GrooperCV.IpCommands
       return approxContour;
     }
 
+    /// <inheritdoc/>
     public PointF[] DetectCornerPoints(VectorOfPoint approxContour)
     {
       List<PointF> cornerPoints = new List<PointF>();
@@ -224,6 +236,8 @@ namespace GrooperCV.IpCommands
       }
       return cornerPoints.ToArray();
     }
+
+    /// <inheritdoc/>
     public Mat DrawPoints(Mat inputImage, IpCommandResult result, Point[] points, VectorOfPoint approxContour)
     {
       Mat con = new Mat(inputImage.Size, DepthType.Cv8U, 3);
@@ -247,6 +261,7 @@ namespace GrooperCV.IpCommands
       return con;
     }
 
+    /// <inheritdoc/>
     public static Point[] OrderPoints(Point[] pts)
     {
       if (pts.Length != 4) { throw new ArgumentException("The array must contain exactly 4 points"); }
@@ -262,6 +277,7 @@ namespace GrooperCV.IpCommands
       return orderedPts;
     }
 
+    /// <inheritdoc/>
     public Mat ConverToGray(Mat inputImage, IpCommandResult result)
     {
       Mat gray = new Mat();
