@@ -16,37 +16,41 @@ namespace GrooperCV.IpCommands
   [DataContract, IconResource("AutoWarp"), Category("OpenCV")]
   class AutoWarp : IpCommand
   {
+    #region initialization & properties
     public AutoWarp() { }
-
     public AutoWarp(ConnectedObject owner) : base(owner) { }
     /// <summary> The image quality to be used for the image processing and detection alogrithms. This does not affect the image quality of the final output </summary>
     /// <remarks>Images captured from mobile devices often poses high resolution causing slowness. </remarks>
     [DataMember, Viewable, DisplayName("Image Quality"), DV(20), ValueRange(LowValue: 20, HighValue: 100)]
     public int Quality { get; set; }
-    private List<PointF> Points { get; set; }
+    #endregion
     protected override IpCommandResult ApplyCommand(GrooperImage image)
     {
       IpCommandResult result = new IpCommandResult(this, image);
-      Mat input, morph, grabCut, grayScale, contours, points, transform = null;
-      input = DownscaleImage(image, Quality);
+      Mat input, morph, grabCut, grayScale, contours;
+      input = DownscaleImage(image, result);
       morph = ApplyMorphologicalClose(input, result);
       grabCut = ApplyGrabCut(morph, result);
       grayScale = ConverToGray(grabCut, result);
-      contours = ApplyEdgeAndContourDetection(grayScale, result);
-      points = DetectCornerPoints(contours);
-      transform = ApplyPerspectiveTransform(image.ToMat(), Points.ToArray());
+      contours = CountourDetection(grayScale, result);
+      VectorOfPoint approxContours = AproximateContours(contours);
+      PointF[] points = DetectCornerPoints(approxContours);
+      _ = DrawPoints(contours, result, OrderPoints(approxContours.ToArray()), approxContours);
+      Mat transform = ApplyPerspectiveTransform(image.ToMat(), points);
       result.Image = transform.ToGrooperImage();
+
       return result;
     }
-    public static Mat DownscaleImage(GrooperImage image, int scalePercentage)
+
+    public Mat DownscaleImage(GrooperImage image, IpCommandResult result)
     {
       Mat inputImage = image.ToMat();
-      if (scalePercentage == 100) return inputImage;
-      double scale = scalePercentage / 100.0;
+      if (Quality == 100) { return inputImage; }
+      double scale = Quality / 100.0;
       Size newSize = new Size((int)(inputImage.Width * scale), (int)(inputImage.Height * scale));
       Mat downscaledImage = new Mat();
       CvInvoke.Resize(inputImage, downscaledImage, newSize, 0, 0, Inter.Linear);
-
+      if (DiagMode) { result.AddDiagImage("Downscale", downscaledImage.ToGrooperImage()); }
       return downscaledImage;
     }
 
@@ -74,7 +78,7 @@ namespace GrooperCV.IpCommands
       // Process the mask, set background and probable background to 0, foreground and probable foreground to 1
       Mat foregroundMask = new Mat(mask.Size, DepthType.Cv8U, 1);
       mask.CopyTo(foregroundMask);
-      CvInvoke.Threshold(mask, foregroundMask, 2, 1, ThresholdType.Binary);
+      _ = CvInvoke.Threshold(mask, foregroundMask, 2, 1, ThresholdType.Binary);
       // Use the mask to extract the foreground
       Mat resultImage = new Mat();
       img.CopyTo(resultImage, foregroundMask);
@@ -82,7 +86,7 @@ namespace GrooperCV.IpCommands
       return resultImage;
     }
 
-    public Mat ApplyEdgeAndContourDetection(Mat inputImage, IpCommandResult result)
+    public Mat CountourDetection(Mat inputImage, IpCommandResult result)
     {
       // Edge Detection
       Mat canny = new Mat();
@@ -128,8 +132,8 @@ namespace GrooperCV.IpCommands
 
     public Mat ApplyPerspectiveTransform(Mat image, PointF[] srcCorners)
     {
-      PointF[] dstCorners = FindDestinationCoordinates(srcCorners);
       AdjustPoints(srcCorners, Quality);
+      PointF[] dstCorners = FindDestinationCoordinates(srcCorners);
       // Calculate the perspective transform matrix
       Mat perspectiveTransform = CvInvoke.GetPerspectiveTransform(srcCorners, dstCorners);
       // Apply the perspective transformation
@@ -138,11 +142,10 @@ namespace GrooperCV.IpCommands
       return warpedImage;
     }
 
-    #region Utility Functions
     public static PointF[] FindDestinationCoordinates(PointF[] pts)
     {
       // Unpack the points
-      var (tl, tr, br, bl) = (pts[0], pts[1], pts[2], pts[3]);
+      (PointF tl, PointF tr, PointF br, PointF bl) = (pts[0], pts[1], pts[2], pts[3]);
 
       // Finding the maximum width.
       float widthA = (float)Math.Sqrt(Math.Pow(br.X - bl.X, 2) + Math.Pow(br.Y - bl.Y, 2));
@@ -165,29 +168,27 @@ namespace GrooperCV.IpCommands
 
       return destinationCorners;
     }
+
     private static void AdjustPoints(PointF[] points, int Scale)
     {
       for (int i = 0; i < points.Length; i++)
       {
-        var point = points[i];
-        point.X = point.X / (Scale / 100.0f);
-        point.Y = point.Y / (Scale / 100.0f);
+        PointF point = points[i];
+        point.X /= Scale / 100.0f;
+        point.Y /= Scale / 100.0f;
         points[i] = point;
       }
-
     }
-    public Mat DetectCornerPoints(Mat inputImage)
-    {
 
+    public VectorOfPoint AproximateContours(Mat inputImage)
+    {
       Mat gray = inputImage;
       CvInvoke.CvtColor(inputImage, gray, ColorConversion.Bgr2Gray);
       Mat binaryImage = new Mat();
-      CvInvoke.Threshold(inputImage, binaryImage, 1, 255, ThresholdType.Binary);
-
+      _ = CvInvoke.Threshold(inputImage, binaryImage, 1, 255, ThresholdType.Binary);
       VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
       Mat hierarchy = new Mat();
       CvInvoke.FindContours(binaryImage, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-
       VectorOfPoint approxContour = null;
 
       for (int i = 0; i < contours.Size; i++)
@@ -205,21 +206,29 @@ namespace GrooperCV.IpCommands
         }
       }
 
+      return approxContour;
+    }
+
+    public PointF[] DetectCornerPoints(VectorOfPoint approxContour)
+    {
       List<PointF> cornerPoints = new List<PointF>();
       Point[] points = approxContour.ToArray();
-      Points = new List<PointF>();
+
       if (approxContour != null)
       {
         points = OrderPoints(points);
         foreach (Point p in points)
         {
           cornerPoints.Add(p);
-          Points.Add(new Point(p.X, p.Y));
         }
-        //set global points 
       }
+      return cornerPoints.ToArray();
+    }
+    public Mat DrawPoints(Mat inputImage, IpCommandResult result, Point[] points, VectorOfPoint approxContour)
+    {
       Mat con = new Mat(inputImage.Size, DepthType.Cv8U, 3);
       con.SetTo(new MCvScalar(0, 0, 0)); // Making canvas black
+
       if (approxContour != null)
       {
         CvInvoke.DrawContours(con, new VectorOfVectorOfPoint(approxContour), -1, new MCvScalar(0, 255, 255), 3); // Draw the quadrilateral
@@ -234,37 +243,34 @@ namespace GrooperCV.IpCommands
         }
       }
 
+      if (DiagMode) { result.AddDiagImage("Corners", con.ToGrooperImage()); }
       return con;
     }
 
     public static Point[] OrderPoints(Point[] pts)
     {
-      if (pts.Length != 4)
-        throw new ArgumentException("The array must contain exactly 4 points");
-
+      if (pts.Length != 4) { throw new ArgumentException("The array must contain exactly 4 points"); }
       Point[] orderedPts = new Point[4];
-      var sum = pts.Select(p => p.X + p.Y);
+      IEnumerable<int> sum = pts.Select(p => p.X + p.Y);
       orderedPts[0] = pts[sum.ToList().IndexOf(sum.Min())]; // Top-left
       orderedPts[2] = pts[sum.ToList().IndexOf(sum.Max())]; // Bottom-right
 
-      var diff = pts.Select(p => p.Y - p.X);
+      IEnumerable<int> diff = pts.Select(p => p.Y - p.X);
       orderedPts[1] = pts[diff.ToList().IndexOf(diff.Min())]; // Top-right
       orderedPts[3] = pts[diff.ToList().IndexOf(diff.Max())]; // Bottom-left
 
       return orderedPts;
     }
+
     public Mat ConverToGray(Mat inputImage, IpCommandResult result)
     {
       Mat gray = new Mat();
       CvInvoke.CvtColor(inputImage, gray, ColorConversion.Bgr2Gray);
       CvInvoke.GaussianBlur(gray, gray, new Size(11, 11), 0);
+
       if (DiagMode) { result.AddDiagImage("Gray", gray.ToGrooperImage()); }
 
       return gray;
     }
-    #endregion
   }
 }
-
-
-

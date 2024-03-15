@@ -67,5 +67,11 @@
             6) More information can be found using Grooper Help (open Grooper and click F1) or the Grooper Wiki: https://wiki.grooper.com/.
             </remarks>
         </member>
+        <member name="M:GrooperCV.ScriptingSession.Initialize(Grooper.GrooperNode)">
+            <inheritdoc/>
+        </member>
+        <member name="M:GrooperCV.ScriptingSession.Uninitialize">
+            <inheritdoc/>
+        </member>
     </members>
 </doc>

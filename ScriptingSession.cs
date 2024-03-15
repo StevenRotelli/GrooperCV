@@ -25,6 +25,8 @@ namespace GrooperCV
   {
     private ObjectLibrary ObjectLibrary;
     private GrooperRoot Root;
+
+    /// <inheritdoc/>
     public override bool Initialize(GrooperNode Item)
     {
       ObjectLibrary = (ObjectLibrary)Item;
@@ -32,9 +34,7 @@ namespace GrooperCV
       return true;
     }
 
-    public override bool Uninitialize()
-    {
-      return true;
-    }
+    /// <inheritdoc/>
+    public override bool Uninitialize() => true;
   }
 }
